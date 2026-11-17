@@ -1,9 +1,15 @@
+/*
+
+    Script for storing the data of a tile.
+    Includes the instance ID and the two elements that make up the tile.
+
+*/
 public enum ElementType
 {
     Fire,
     Water,
     Earth,
-    Air,
+    Wind,
     Light,
     Shadow
 }
