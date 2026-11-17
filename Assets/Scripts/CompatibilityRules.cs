@@ -1,5 +1,6 @@
 /*
-
+    CompatibilityRules.cs
+    
     Script for storing the compatability rules of the domino pieces.
     These will follow a circular pattern, 
     where each element is compatible with the two elements next to it in the circle.

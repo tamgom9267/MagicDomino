@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35af41e361beafa498bddc5596bb59f3, type: 3}
+  m_Name: BaseTileSprites
+  m_EditorClassIdentifier: Assembly-CSharp::TileSpriteCatalog
+  tiles:
+  - ElementA: 0
+    ElementB: 3
+    TileSprite: {fileID: -5983292771483742501, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 1
+    ElementB: 3
+    TileSprite: {fileID: -2158460457352838503, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 0
+    ElementB: 2
+    TileSprite: {fileID: 74803915479927977, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 1
+    ElementB: 2
+    TileSprite: {fileID: 3676463571561421704, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 0
+    ElementB: 4
+    TileSprite: {fileID: -1742724582815353029, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 4
+    ElementB: 1
+    TileSprite: {fileID: 2238310033462216061, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 1
+    ElementB: 0
+    TileSprite: {fileID: -2381709545638021245, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 5
+    ElementB: 1
+    TileSprite: {fileID: 7918433718526673496, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 5
+    ElementB: 0
+    TileSprite: {fileID: 680195599268343138, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 4
+    ElementB: 5
+    TileSprite: {fileID: -2582988843269194826, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 0
+    ElementB: 0
+    TileSprite: {fileID: -3194742666043166515, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 1
+    ElementB: 1
+    TileSprite: {fileID: -225453436762470239, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 2
+    ElementB: 2
+    TileSprite: {fileID: -1029834355381505650, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 3
+    ElementB: 3
+    TileSprite: {fileID: -4774679886961086889, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 2
+    ElementB: 3
+    TileSprite: {fileID: 3010090842140549460, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 3
+    ElementB: 4
+    TileSprite: {fileID: -5812106817620756020, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 3
+    ElementB: 5
+    TileSprite: {fileID: 2735959454421446013, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 2
+    ElementB: 5
+    TileSprite: {fileID: -5386902645446961914, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 2
+    ElementB: 4
+    TileSprite: {fileID: 1324511763636443020, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 5
+    ElementB: 5
+    TileSprite: {fileID: 8181373829138454293, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}
+  - ElementA: 4
+    ElementB: 4
+    TileSprite: {fileID: 2489194342782629373, guid: 369ff6e4146c8b240a8d36b7ac0e9668, type: 3}

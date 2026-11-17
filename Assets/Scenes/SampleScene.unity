@@ -1041,6 +1041,7 @@ GameObject:
   - component: {fileID: 1169977997}
   - component: {fileID: 1169977999}
   - component: {fileID: 1169977998}
+  - component: {fileID: 1169978000}
   m_Layer: 5
   m_Name: PlayerHandPanel
   m_TagString: Untagged
@@ -1106,6 +1107,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1169977996}
   m_CullTransparentMesh: 1
+--- !u!114 &1169978000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1169977996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f2345d03caa1c4eb2ea8d25f8b837d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HandView
+  tileContainer: {fileID: 1455329428}
+  tilePrefab: {fileID: 8626041309994111426, guid: 0714f7526a6616541a19d4aae01bd95f, type: 3}
+  tileSpriteCatalog: {fileID: 11400000, guid: 175daec85487c0047bb846f8b3a95d28, type: 2}
 --- !u!1 &1282124129
 GameObject:
   m_ObjectHideFlags: 0
