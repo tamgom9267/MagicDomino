@@ -66,4 +66,16 @@ public class PlayerData
         hand.AddRange(shuffledCollection.GetRange(0, 7));
         drawPile.AddRange(shuffledCollection.GetRange(7, shuffledCollection.Count - 7));
     }
+
+
+    public bool HasTileInHand(TileData tile)
+    {
+        return hand.Contains(tile);
+    }
+
+    public bool RemoveTileFromHand(TileData tile)
+    {
+        return hand.Remove(tile);
+    }
+
 }
