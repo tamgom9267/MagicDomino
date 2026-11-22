@@ -107,14 +107,14 @@ public class BoardModel
         if (side == BoardSide.Left)
         {
             // Element B should face the board
-            isFlipped = CompatibilityRules.CanConnect(tile.ElementB, GetLeftEnd());
+            isFlipped = !CompatibilityRules.CanConnect(tile.ElementB, GetLeftEnd());
 
             placedTiles.AddFirst(new PlacedTile(tile, side, isFlipped));
         }
         else
         {
             // Element A should face the board
-            isFlipped = CompatibilityRules.CanConnect(tile.ElementA, GetRightEnd());
+            isFlipped = !CompatibilityRules.CanConnect(tile.ElementA, GetRightEnd());
 
             placedTiles.AddLast(new PlacedTile(tile, side, isFlipped));
         }

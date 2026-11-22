@@ -40,7 +40,7 @@ public static class CompatibilityRules
         {(ElementType.Water, ElementType.Earth), ReactionType.Mud},
         {(ElementType.Water, ElementType.Shadow), ReactionType.DarkMist},
         {(ElementType.Wind, ElementType.Light), ReactionType.Flash},
-        {(ElementType.Shadow, ElementType.Light), ReactionType.Eclipse}
+        {(ElementType.Light, ElementType.Shadow), ReactionType.Eclipse}
     };
 
     // Check if the two elements can connect

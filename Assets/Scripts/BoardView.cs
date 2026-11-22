@@ -15,6 +15,8 @@ public class BoardView : MonoBehaviour
     [SerializeField] private TileView tilePrefab;
     [SerializeField] private TileSpriteCatalog spriteCatalog;
 
+    bool spriteReversed;
+
     [SerializeField] private float spacing = 4f; // Adjust this value for desired spacing between tiles
 
     private List<TileView> currentTiles = new();
@@ -29,7 +31,7 @@ public class BoardView : MonoBehaviour
         foreach (var placedTile in board.PlacedTiles)
         {
             // Get the sprite for the tile based on its elements.
-            Sprite tileSprite = spriteCatalog.GetSprite(placedTile.TileData.ElementA, placedTile.TileData.ElementB);
+            Sprite tileSprite = spriteCatalog.GetSprite(placedTile.TileData.ElementA, placedTile.TileData.ElementB, out spriteReversed);
 
             // Instantiate a new TileView prefab.
             TileView tileView = Instantiate(tilePrefab, tilesContainer);
@@ -39,8 +41,15 @@ public class BoardView : MonoBehaviour
             tileView.SetInteractable(false);
 
             // Set the orientation of the tile based on whether it is flipped.
+            bool visualFlipped = placedTile.IsFlipped ^ spriteReversed;
+
             RectTransform rect = tileView.GetComponent<RectTransform>();
-            rect.localRotation = Quaternion.Euler(0, 0, placedTile.IsFlipped ? -90f : 90f); // Rotate the tile 90 degrees if flipped
+
+            rect.localRotation = Quaternion.Euler(
+                0,
+                0,
+                visualFlipped ? -90f : 90f
+            );
             
             currentTiles.Add(tileView);
         }
