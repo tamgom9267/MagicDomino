@@ -78,4 +78,23 @@ public class PlayerData
         return hand.Remove(tile);
     }
 
+
+    public bool TryDrawTile(out TileData drawnTile)
+    {
+        drawnTile = null;
+
+        if (drawPile.Count == 0)
+            return false;
+
+        int lastIndex = drawPile.Count - 1;
+
+        drawnTile = drawPile[lastIndex];
+
+        drawPile.RemoveAt(lastIndex);
+        hand.Add(drawnTile);
+
+        return true;
+    }
+
+
 }

@@ -17,6 +17,7 @@ public class BoardInteractionController : MonoBehaviour
     [Header("Buttons")]
     [SerializeField] private Button leftButton;
     [SerializeField] private Button rightButton;
+    [SerializeField] private Button drawButton;
 
     private PlayerData player;
     private BoardModel board;
@@ -38,6 +39,7 @@ public class BoardInteractionController : MonoBehaviour
 
         leftButton.onClick.AddListener(PlaceLeft);
         rightButton.onClick.AddListener(PlaceRight);
+        drawButton.onClick.AddListener(DrawTile);
 
         UpdatePlacementButtons();
     }
@@ -107,8 +109,27 @@ public class BoardInteractionController : MonoBehaviour
 
         leftButton.onClick.RemoveListener(PlaceLeft);
         rightButton.onClick.RemoveListener(PlaceRight);
+        drawButton.onClick.RemoveListener(DrawTile);
     }
 
+
+    private void DrawTile()
+    {
+        // 1. Try drawing a tile from PlayerData.
+        player.TryDrawTile(out TileData drawnTile);
+
+        // 2. If the draw fails, return.
+        if (drawnTile == null)
+        {
+            return;
+        }
+
+        // 3. Update HandView with the new hand.
+        playerHandView.ShowHand(player.Hand);
+
+        // 4. Update the placement buttons.
+        UpdatePlacementButtons();
+    }
 
     private void DebugBoard()
     {
