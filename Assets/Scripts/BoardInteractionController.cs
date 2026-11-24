@@ -1,8 +1,7 @@
 /*
     BoardInteractionController.cs
 
-    Placeholder script that handles the interaction between the hand and the board
-    Will be replaced when the game states are implemented
+    Script that handles the interaction between the hand and the board
 
 */
 using UnityEngine;
@@ -19,29 +18,33 @@ public class BoardInteractionController : MonoBehaviour
     [SerializeField] private Button rightButton;
     [SerializeField] private Button drawButton;
 
-    private PlayerData player;
-    private BoardModel board;
+    [SerializeField] private GameController gameController;
 
     
 
     private void Start()
     {
-        player = new PlayerData(0);
-        player.CreateInitialTileCollection();
-        player.StartRound();
-
-        board = new BoardModel();
-
-        playerHandView.ShowHand(player.Hand);
-        boardView.ShowBoard(board);
-
         playerHandView.OnSelectionChanged += HandleSelectionChanged;
 
         leftButton.onClick.AddListener(PlaceLeft);
         rightButton.onClick.AddListener(PlaceRight);
         drawButton.onClick.AddListener(DrawTile);
 
+        RefreshViews();
+    }
+
+    private void RefreshViews()
+    {
+        playerHandView.ShowHand(gameController.Hand);
+        boardView.ShowBoard(gameController.Board);
+
         UpdatePlacementButtons();
+        UpdateDrawButton();
+    }
+
+    private void UpdateDrawButton()
+    {
+        drawButton.interactable = gameController.CanDraw();
     }
 
     private void HandleSelectionChanged(TileData selectedTile)
@@ -70,36 +73,25 @@ public class BoardInteractionController : MonoBehaviour
             return;
         }
 
-        if (board.IsEmpty())
-        {
-            leftButton.interactable = false;
-            rightButton.interactable = true;
-            return;
-        }
-
-        leftButton.interactable = board.CanPlace(selectedTile, BoardSide.Left);
-        rightButton.interactable = board.CanPlace(selectedTile, BoardSide.Right);
+        leftButton.interactable = gameController.CanPlace(selectedTile, BoardSide.Left);
+        rightButton.interactable = gameController.CanPlace(selectedTile, BoardSide.Right);
     }
 
     private void TryPlaceSelectedTile(BoardSide side)
     {
         TileData selectedTile = playerHandView.SelectedTile;
 
-        if (selectedTile == null || !player.HasTileInHand(selectedTile))
+        if (selectedTile == null)
         {
             return;
         }
 
-        if (!board.TryPlaceTile(selectedTile, side))
+        if (!gameController.TryPlaceTile(selectedTile, side))
         {
             return;
         }
 
-        player.RemoveTileFromHand(selectedTile);
-        playerHandView.ShowHand(player.Hand);
-        boardView.ShowBoard(board);
-        DebugBoard();
-        UpdatePlacementButtons();
+        RefreshViews();
     }
 
     private void OnDestroy()
@@ -115,52 +107,12 @@ public class BoardInteractionController : MonoBehaviour
 
     private void DrawTile()
     {
-        // 1. Try drawing a tile from PlayerData.
-        player.TryDrawTile(out TileData drawnTile);
-
-        // 2. If the draw fails, return.
-        if (drawnTile == null)
+        if (!gameController.TryDrawTile())
         {
             return;
         }
 
-        // 3. Update HandView with the new hand.
-        playerHandView.ShowHand(player.Hand);
-
-        // 4. Update the placement buttons.
-        UpdatePlacementButtons();
-    }
-
-    private void DebugBoard()
-    {
-        PlacedTile previous = null;
-
-        foreach (PlacedTile tile in board.PlacedTiles)
-        {
-            Debug.Log(
-                $"Tile {tile.TileData.InstanceId}: " +
-                $"{tile.LeftElement} | {tile.RightElement} " +
-                $"Flipped: {tile.IsFlipped}"
-            );
-
-            if (previous != null)
-            {
-                bool valid = CompatibilityRules.CanConnect(
-                    previous.RightElement,
-                    tile.LeftElement
-                );
-
-                if (!valid)
-                {
-                    Debug.LogError(
-                        $"Invalid connection: " +
-                        $"{previous.RightElement} + {tile.LeftElement}"
-                    );
-                }
-            }
-
-            previous = tile;
-        }
+        RefreshViews();
     }
 
 }

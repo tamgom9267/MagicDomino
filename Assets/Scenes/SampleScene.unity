@@ -751,9 +751,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 561104931}
-  - component: {fileID: 561104932}
-  - component: {fileID: 561104933}
   - component: {fileID: 561104934}
+  - component: {fileID: 561104935}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -776,32 +775,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &561104932
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 561104930}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 155049e8c7a13874b9591723c9da7eb4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HandTestSetup
-  playerHandView: {fileID: 1169978000}
---- !u!114 &561104933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 561104930}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52626fe83ac378d4fa9b592e5ae773c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BoardTestSetup
-  boardView: {fileID: 1924085291}
 --- !u!114 &561104934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -819,6 +792,19 @@ MonoBehaviour:
   leftButton: {fileID: 877179650}
   rightButton: {fileID: 154637286}
   drawButton: {fileID: 174645289}
+  gameController: {fileID: 561104935}
+--- !u!114 &561104935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 561104930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbab9328124e793479373cf71604bfaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameController
 --- !u!1 &565752485
 GameObject:
   m_ObjectHideFlags: 0
