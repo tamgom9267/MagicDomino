@@ -8,20 +8,21 @@ using System.Collections.Generic;
 
 public class GameSession
 {
-    public PlayerData Player { get; }
-    public BoardModel Board { get; }
-
-    public GameSession()
-    {
-        Player = new PlayerData(0);
-        Player.CreateInitialTileCollection();
-
-        Board = new BoardModel();
-    }
 
     private readonly Dictionary<int, PlayerData> players = new();
 
     public IReadOnlyDictionary<int, PlayerData> Players => players;
+
+    public int LocalActorNumber { get; private set; } = -1;
+
+    public PlayerData Player => GetPlayer(LocalActorNumber);
+
+    public BoardModel Board { get; }
+
+    public GameSession()
+    {
+        Board = new BoardModel();
+    }
 
     public void RegisterPlayer(int actorNumber)
     {
@@ -34,9 +35,16 @@ public class GameSession
         players.Add(actorNumber, player);
     }
 
+    public void SetLocalPlayer(int actorNumber)
+    {
+        RegisterPlayer(actorNumber);
+        LocalActorNumber = actorNumber;
+    }
+
     public PlayerData GetPlayer(int actorNumber)
     {
         return players[actorNumber];
     }
+
 
 }

@@ -21,8 +21,8 @@ public class GameController : MonoBehaviour
         session = new GameSession();
         stateMachine = new GameStateMachine();
 
-        stateMachine.ChangeState(new SetupState(session));
-        stateMachine.ChangeState(new PlayingState(session));
+        // stateMachine.ChangeState(new SetupState(session));
+        // stateMachine.ChangeState(new PlayingState(session));
     }
 
     public bool CanPlace(TileData tile, BoardSide side)
@@ -63,5 +63,15 @@ public class GameController : MonoBehaviour
         }
 
         return playing.TryDrawTile();
+    }
+
+    public void RegisterNetworkPlayer(int actorNumber)
+    {
+        session.RegisterPlayer(actorNumber);
+    }
+
+    public void SetLocalPlayer(int actorNumber)
+    {
+        session.SetLocalPlayer(actorNumber);
     }
 }
