@@ -30,7 +30,7 @@ public class BoardInteractionController : MonoBehaviour
         rightButton.onClick.AddListener(PlaceRight);
         drawButton.onClick.AddListener(DrawTile);
 
-        RefreshViews();
+        // RefreshViews();
     }
 
     private void RefreshViews()
