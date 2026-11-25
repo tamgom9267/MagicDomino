@@ -1,15 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Photon.Pun;
 using Photon.Realtime;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
 
-public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
+public partial class MenuController
 {
-    public void CreateNewRoom(TMP_InputField _RoomName)
+    [Header("Create Room")]
+    [SerializeField] private TMP_Text createRoomStatus;
+
+    public void CreateNewRoom(TMP_InputField roomNameInput)
     {
-        NetworkManager.instance.CreateRoom(_RoomName.text);
+        createRoomStatus.text = NetworkManager.instance.CreateRoom(roomNameInput.text.Trim())
+            ? "Creating room..."
+            : "The lobby is busy. Try again in a moment.";
+    }
+
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        createRoomStatus.text = returnCode == ErrorCode.GameIdAlreadyExists
+            ? "That room name is already in use."
+            : "Could not create the room. Try again.";
     }
 }

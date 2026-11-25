@@ -10,7 +10,7 @@ using Photon.Realtime;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 
-public class GameNetworkController : MonoBehaviourPunCallbacks
+public class GameNetworkController : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     [SerializeField] private GameController gameController;
 

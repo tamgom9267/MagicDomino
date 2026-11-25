@@ -1,51 +1,87 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
 
-public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
+public partial class MenuController : MonoBehaviourPunCallbacks
 {
     [Header("Views")]
-    public GameObject MainView;
-    public GameObject CreateRoomView;
-    public GameObject LobbyRoomView;
-    public GameObject GeneralLobbyView;
+    [SerializeField] private GameObject titleView;
+    [SerializeField] private GameObject howToPlayView;
+    [SerializeField] private GameObject MainView;
+    [SerializeField] private GameObject CreateRoomView;
+    [SerializeField] private GameObject LobbyRoomView;
+    [SerializeField] private GameObject GeneralLobbyView;
 
-    void Start()
+    private GameObject activeView;
+
+    private void Start()
     {
-        btnCreateRoom.interactable = false;
-        btnFindRoom.interactable = false;
+        bool online = PhotonNetwork.InLobby;
+        SetOnlineStatus(online, online ? "Online" : "Connecting...");
 
         if (PhotonNetwork.InRoom)
         {
             PhotonNetwork.CurrentRoom.IsVisible = true;
             PhotonNetwork.CurrentRoom.IsOpen = true;
+            OnJoinedRoom();
+            return;
         }
+
+        SetScreen(titleView);
     }
 
-    public override void OnConnectedToMaster()
+    public override void OnJoinedLobby()
     {
-        //base.OnConnectedToMaster();
-        btnCreateRoom.interactable = true;
-        btnFindRoom.interactable = true;
+        roomsInfo.Clear();
+        SetOnlineStatus(true, "Online");
+        UpdateRoomList();
     }
 
-    void SetScreen(GameObject _screen)
+    public override void OnDisconnected(DisconnectCause cause)
     {
-        LobbyRoomView.SetActive(false);
-        CreateRoomView.SetActive(false);
-        GeneralLobbyView.SetActive(false);
-        MainView.SetActive(false);
+        roomsInfo.Clear();
+        SetOnlineStatus(false, "Disconnected");
 
-        _screen.SetActive(true);
+        if (activeView == CreateRoomView || activeView == GeneralLobbyView || activeView == LobbyRoomView)
+            BackMainView();
+    }
 
-        if (_screen == GeneralLobbyView)
+    private void SetScreen(GameObject screen)
+    {
+        titleView.SetActive(screen == titleView);
+        howToPlayView.SetActive(screen == howToPlayView);
+        MainView.SetActive(screen == MainView);
+        CreateRoomView.SetActive(screen == CreateRoomView);
+        LobbyRoomView.SetActive(screen == LobbyRoomView);
+        GeneralLobbyView.SetActive(screen == GeneralLobbyView);
+        activeView = screen;
+
+        if (screen == GeneralLobbyView)
+            UpdateRoomList();
+
+        if (EventSystem.current != null)
         {
-            updateLobbyBrowserUI();
+            foreach (Button button in screen.GetComponentsInChildren<Button>())
+            {
+                if (!button.interactable)
+                    continue;
+
+                EventSystem.current.SetSelectedGameObject(button.gameObject);
+                break;
+            }
         }
+    }
+
+    public void ShowTitle()
+    {
+        SetScreen(titleView);
+    }
+
+    public void ShowHowToPlay()
+    {
+        SetScreen(howToPlayView);
     }
 
     public void BackMainView()
@@ -53,5 +89,12 @@ public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
         SetScreen(MainView);
     }
 
-    
+    public void ExitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
 }

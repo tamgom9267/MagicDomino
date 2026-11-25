@@ -1,32 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
+using Photon.Realtime;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class RoomData : MonoBehaviour
 {
-    public TextMeshProUGUI NameRoom;
-    public TextMeshProUGUI currentTotalPlayers;
+    [SerializeField] private TMP_Text roomName;
+    [SerializeField] private TMP_Text playerCount;
+    [SerializeField] private Button joinButton;
 
-    public Button joinButton;
-    
-    public void UpdateData(string _RoomName, int _CurrentPlayers)
+    public void UpdateData(RoomInfo room)
     {
-        NameRoom.text = _RoomName;
-        currentTotalPlayers.text = _CurrentPlayers.ToString() + "/" + NetworkManager.instance.maxPlayer.ToString();
-
-        AddListenerToButton(_RoomName);
-    }
-
-    public void AddListenerToButton(string _RoomName)
-    {
-        joinButton.onClick.RemoveAllListeners();
-        joinButton.onClick.AddListener(() => { JoinRoomOnClick(_RoomName); });
-    }
-
-    public void JoinRoomOnClick(string _roomName)
-    {
-        NetworkManager.instance.JoinRoom(_roomName);
+        roomName.text = room.Name;
+        playerCount.text = room.MaxPlayers == 0
+            ? room.PlayerCount.ToString()
+            : $"{room.PlayerCount} / {room.MaxPlayers}";
+        joinButton.interactable = room.IsOpen && (room.MaxPlayers == 0 || room.PlayerCount < room.MaxPlayers);
+        joinButton.onClick.AddListener(() => NetworkManager.instance.JoinRoom(room.Name));
     }
 }

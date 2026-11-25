@@ -1,24 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
-public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
+public partial class MenuController
 {
-    [Header("Main Screen")]
-    public Button btnCreateRoom;
-    public Button btnFindRoom;
+    [Header("Online Lobby")]
+    [SerializeField] private Button btnCreateRoom;
+    [SerializeField] private Button btnFindRoom;
+    [SerializeField] private TMP_Text connectionStatus;
 
-    public void UpdateNickName(TMP_InputField _playerName)
+    private void SetOnlineStatus(bool online, string status)
     {
-        PhotonNetwork.NickName = _playerName.text;
+        btnCreateRoom.interactable = online;
+        btnFindRoom.interactable = online;
+        connectionStatus.text = status;
+    }
+
+    public void UpdateNickName(TMP_InputField playerNameInput)
+    {
+        PhotonNetwork.NickName = playerNameInput.text.Trim();
     }
 
     public void ShowCreateRoom()
     {
+        createRoomStatus.text = "";
         SetScreen(CreateRoomView);
     }
 

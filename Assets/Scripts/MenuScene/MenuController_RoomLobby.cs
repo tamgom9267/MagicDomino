@@ -1,25 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System.Text;
 using Photon.Pun;
 using Photon.Realtime;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
-public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
+public partial class MenuController
 {
-    [Header("Lobby Room")]
-    public TextMeshProUGUI playerName;
-    public TextMeshProUGUI roomName;
-    public Button startButton;
+    [Header("Room Lobby")]
+    [SerializeField] private TMP_Text playerName;
+    [SerializeField] private TMP_Text roomName;
+    [SerializeField] private TMP_Text roomLobbyStatus;
+    [SerializeField] private Button startButton;
 
     public override void OnJoinedRoom()
     {
-        //base.OnJoinedRoom();
-        Debug.Log("Joined Room");
-
-        SetScreen(LobbyRoomView);
         UpdatePlayerList();
+        SetScreen(LobbyRoomView);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -32,33 +29,52 @@ public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
         UpdatePlayerList();
     }
 
-    public void UpdatePlayerList()
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        UpdatePlayerList();
+    }
+
+    private void UpdatePlayerList()
     {
         startButton.interactable = PhotonNetwork.IsMasterClient;
+        roomLobbyStatus.text = PhotonNetwork.IsMasterClient
+            ? "You are the host."
+            : "Waiting for the host to start.";
 
-        playerName.text = "";
-
+        var roster = new StringBuilder();
         foreach (Player player in PhotonNetwork.PlayerList)
         {
+            if (roster.Length > 0)
+                roster.AppendLine();
+
             string displayName = string.IsNullOrWhiteSpace(player.NickName)
                 ? "Player " + player.ActorNumber
-                : player.NickName;
-            playerName.text += displayName + "\n";
+                : player.NickName.Replace('\r', ' ').Replace('\n', ' ');
+            roster.Append(displayName);
+            if (player.IsMasterClient)
+                roster.Append(" (Host)");
         }
+
+        playerName.text = roster.ToString();
         roomName.text = PhotonNetwork.CurrentRoom.Name;
     }
 
     public void StartGame()
     {
+        if (!PhotonNetwork.InRoom || !PhotonNetwork.IsMasterClient)
+            return;
+
         PhotonNetwork.CurrentRoom.IsOpen = false;
         PhotonNetwork.CurrentRoom.IsVisible = false;
-        // tell everyone to load the game scene
         NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, "GameScene");
     }
 
     public void LeaveCurrentLobby()
     {
-        PhotonNetwork.LeaveRoom();
-        SetScreen(MainView);
+        if (PhotonNetwork.LeaveRoom())
+        {
+            SetOnlineStatus(false, "Rejoining the lobby...");
+            BackMainView();
+        }
     }
 }

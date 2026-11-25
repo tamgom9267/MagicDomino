@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-using UnityEngine.UI;
-using TMPro;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -35,12 +31,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("Created Room");
     }
 
-    public void CreateRoom(string _RoomName)
+    public bool CreateRoom(string _RoomName)
     {
         RoomOptions options = new RoomOptions();
         options.MaxPlayers = (byte)maxPlayer;
 
-        PhotonNetwork.CreateRoom(_RoomName, options);
+        return PhotonNetwork.CreateRoom(_RoomName, options);
     }
 
     public void JoinRoom(string _RoomName)
