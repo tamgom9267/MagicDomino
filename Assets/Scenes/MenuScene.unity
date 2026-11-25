@@ -1517,7 +1517,6 @@ MonoBehaviour:
   LobbyRoomView: {fileID: 301707100}
   GeneralLobbyView: {fileID: 1480790868}
   roomListContainer: {fileID: 1850480717}
-  roomPrefab: {fileID: 9207777227312323277, guid: 6f84e5cf7d915da42948d2a6b0737738, type: 3}
   btnUpdate: {fileID: 1733653929}
   btnCreateRoom: {fileID: 1544053248}
   btnFindRoom: {fileID: 2094821370}
