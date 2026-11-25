@@ -8,7 +8,7 @@ using TMPro;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
-    public int maxPlayer = 5;
+    public int maxPlayer = 2;
 
     public static NetworkManager instance;
 

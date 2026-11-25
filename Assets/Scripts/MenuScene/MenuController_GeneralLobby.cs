@@ -91,6 +91,27 @@ public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
     public override void OnRoomListUpdate(List<RoomInfo> Activeroom)
     {
         Debug.Log("Lista actualizada");
-        roomsInfo = Activeroom;
+        foreach (RoomInfo room in Activeroom)
+        {
+            int existingIndex = roomsInfo.FindIndex(existingRoom => existingRoom.Name == room.Name);
+
+            if (room.RemovedFromList)
+            {
+                if (existingIndex >= 0)
+                {
+                    roomsInfo.RemoveAt(existingIndex);
+                }
+            }
+            else if (existingIndex >= 0)
+            {
+                roomsInfo[existingIndex] = room;
+            }
+            else
+            {
+                roomsInfo.Add(room);
+            }
+        }
+
+        updateLobbyBrowserUI();
     }
 }

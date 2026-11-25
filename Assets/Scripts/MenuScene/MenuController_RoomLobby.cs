@@ -20,9 +20,12 @@ public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
         Debug.Log("Joined Room");
 
         SetScreen(LobbyRoomView);
+        UpdatePlayerList();
+    }
 
-        photonView.RPC("UpdatePlayerList", RpcTarget.All);
-        //UpdateLobbyUI();
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        UpdatePlayerList();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -30,7 +33,6 @@ public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
         UpdatePlayerList();
     }
 
-    [PunRPC]
     public void UpdatePlayerList()
     {
         startButton.interactable = PhotonNetwork.IsMasterClient;
@@ -39,9 +41,12 @@ public partial class MenuController : MonoBehaviourPunCallbacks, ILobbyCallbacks
 
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            playerName.text += player.NickName + "\n";
+            string displayName = string.IsNullOrWhiteSpace(player.NickName)
+                ? "Player " + player.ActorNumber
+                : player.NickName;
+            playerName.text += displayName + "\n";
         }
-        roomName.text = PhotonNetwork.CurrentRoom.Name.ToString();
+        roomName.text = PhotonNetwork.CurrentRoom.Name;
     }
 
     public void StartGame()
