@@ -7,7 +7,7 @@
 */
 using UnityEngine;
 using System.Collections.Generic;
-using System;
+using UnityEngine.UI;
 
 public class BoardView : MonoBehaviour
 {
@@ -15,15 +15,26 @@ public class BoardView : MonoBehaviour
     [SerializeField] private TileView tilePrefab;
     [SerializeField] private TileSpriteCatalog spriteCatalog;
 
-    bool spriteReversed;
-
-    [SerializeField] private float spacing = 4f; // Adjust this value for desired spacing between tiles
+    [SerializeField] private ScrollRect scrollRect;
+    [SerializeField] private GameObject emptyState;
+    [SerializeField, Min(0.1f)] private float tileScale = 1f;
+    [SerializeField, Min(0f)] private float spacing = 4f;
 
     private List<TileView> currentTiles = new();
 
     // Displays the current board.
-    public void ShowBoard(BoardModel board)
+    public void ShowBoard(BoardModel board, BoardSide? revealSide = null)
     {
+        float scrollPosition = 0.5f;
+        if (scrollRect != null && tilesContainer.rect.width > scrollRect.viewport.rect.width)
+        {
+            scrollPosition = scrollRect.horizontalNormalizedPosition;
+        }
+        if (revealSide.HasValue)
+        {
+            scrollPosition = revealSide == BoardSide.Left ? 0f : 1f;
+        }
+
         // Clear previous visual tiles.
         ClearBoard();
 
@@ -31,7 +42,7 @@ public class BoardView : MonoBehaviour
         foreach (var placedTile in board.PlacedTiles)
         {
             // Get the sprite for the tile based on its elements.
-            Sprite tileSprite = spriteCatalog.GetSprite(placedTile.TileData.ElementA, placedTile.TileData.ElementB, out spriteReversed);
+            Sprite tileSprite = spriteCatalog.GetSprite(placedTile.TileData.ElementA, placedTile.TileData.ElementB, out bool spriteReversed);
 
             // Instantiate a new TileView prefab.
             TileView tileView = Instantiate(tilePrefab, tilesContainer);
@@ -44,6 +55,7 @@ public class BoardView : MonoBehaviour
             bool visualFlipped = placedTile.IsFlipped ^ spriteReversed;
 
             RectTransform rect = tileView.GetComponent<RectTransform>();
+            rect.localScale = new Vector3(tileScale, tileScale, 1f);
 
             rect.localRotation = Quaternion.Euler(
                 0,
@@ -55,6 +67,20 @@ public class BoardView : MonoBehaviour
         }
 
         PositionTiles();
+        if (emptyState != null)
+        {
+            emptyState.SetActive(currentTiles.Count == 0);
+        }
+
+        if (scrollRect != null)
+        {
+            scrollRect.StopMovement();
+            tilesContainer.anchoredPosition = Vector2.zero;
+            if (tilesContainer.rect.width > scrollRect.viewport.rect.width)
+            {
+                scrollRect.horizontalNormalizedPosition = scrollPosition;
+            }
+        }
     }
 
     private void ClearBoard()
@@ -62,6 +88,7 @@ public class BoardView : MonoBehaviour
         // Destroy existing visual tiles.
         foreach (var tile in currentTiles)
         {
+            tile.gameObject.SetActive(false);
             Destroy(tile.gameObject);
         }
         currentTiles.Clear();
@@ -70,9 +97,14 @@ public class BoardView : MonoBehaviour
     private void PositionTiles()
     {
 
-        // The tiles when rotated have a width of 80, so we can use the height to position them in a line.
-        float tileWidth = tilePrefab.GetComponent<RectTransform>().rect.height;
-        float tileStep = tileWidth + spacing; // Total step including spacing
+        // A rotated tile's horizontal span is its original height.
+        float tileWidth = tilePrefab.GetComponent<RectTransform>().rect.height * tileScale;
+        float tileStep = tileWidth + spacing;
+        if (scrollRect != null)
+        {
+            float width = currentTiles.Count == 0 ? 0 : currentTiles.Count * tileStep - spacing;
+            tilesContainer.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+        }
         
         // Position tiles in a horizontal line, adjusting for the width of each tile.
         for (int i = 0; i < currentTiles.Count; i++)

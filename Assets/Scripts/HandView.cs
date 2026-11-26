@@ -8,6 +8,8 @@ public class HandView : MonoBehaviour
     [SerializeField] private RectTransform tileContainer;
     [SerializeField] private TileView tilePrefab;
     [SerializeField] private TileSpriteCatalog tileSpriteCatalog;
+    [SerializeField] private GameObject emptyState;
+    [SerializeField, Min(0.1f)] private float tileScale = 1f;
 
     private Dictionary<int, TileView> tileViews = new();
 
@@ -23,6 +25,7 @@ public class HandView : MonoBehaviour
         foreach (TileData tile in hand)
         {
             TileView view = Instantiate(tilePrefab, tileContainer);
+            view.transform.localScale = new Vector3(tileScale, tileScale, 1f);
 
             Sprite sprite = tileSpriteCatalog.GetSprite(tile.ElementA, tile.ElementB);
 
@@ -32,6 +35,8 @@ public class HandView : MonoBehaviour
 
             tileViews.Add(tile.InstanceId, view);
         }
+
+        UpdateEmptyState();
     }
 
     // Called when a tile is clicked
@@ -68,12 +73,22 @@ public class HandView : MonoBehaviour
         foreach (TileView view in tileViews.Values)
         {
             view.OnTileClicked -= HandleTileClicked;
+            view.gameObject.SetActive(false);
             Destroy(view.gameObject);
         }
 
         tileViews.Clear();
 
         SelectedTile = null;
+        UpdateEmptyState();
+    }
+
+    private void UpdateEmptyState()
+    {
+        if (emptyState != null)
+        {
+            emptyState.SetActive(tileViews.Count == 0);
+        }
     }
 
     private void OnDestroy()

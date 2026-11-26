@@ -30,13 +30,14 @@ public class BoardInteractionController : MonoBehaviour
         rightButton.onClick.AddListener(PlaceRight);
         drawButton.onClick.AddListener(DrawTile);
 
-        // RefreshViews();
+        UpdatePlacementButtons();
+        UpdateDrawButton();
     }
 
-    private void RefreshViews()
+    private void RefreshViews(BoardSide? revealSide = null)
     {
         playerHandView.ShowHand(gameController.Hand);
-        boardView.ShowBoard(gameController.Board);
+        boardView.ShowBoard(gameController.Board, revealSide);
 
         UpdatePlacementButtons();
         UpdateDrawButton();
@@ -91,7 +92,7 @@ public class BoardInteractionController : MonoBehaviour
             return;
         }
 
-        RefreshViews();
+        RefreshViews(side);
     }
 
     private void OnDestroy()
