@@ -5,6 +5,7 @@
 
 */
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,14 +16,26 @@ public class GameController : MonoBehaviour
 
     public IReadOnlyList<TileData> Hand => session.Player.Hand;
     public BoardModel Board => session.Board;
+    public bool IsReady => stateMachine.CurrentState is PlayingState;
+
+    public event Action GameStarted;
 
     private void Awake()
     {
         session = new GameSession();
         stateMachine = new GameStateMachine();
+    }
 
-        // stateMachine.ChangeState(new SetupState(session));
-        // stateMachine.ChangeState(new PlayingState(session));
+    private void StartGame()
+    {
+        if (IsReady)
+        {
+            return;
+        }
+
+        stateMachine.ChangeState(new SetupState(session));
+        stateMachine.ChangeState(new PlayingState(session));
+        GameStarted?.Invoke();
     }
 
     public bool CanPlace(TileData tile, BoardSide side)
@@ -73,5 +86,6 @@ public class GameController : MonoBehaviour
     public void SetLocalPlayer(int actorNumber)
     {
         session.SetLocalPlayer(actorNumber);
+        StartGame();
     }
 }

@@ -30,8 +30,17 @@ public class BoardInteractionController : MonoBehaviour
         rightButton.onClick.AddListener(PlaceRight);
         drawButton.onClick.AddListener(DrawTile);
 
-        UpdatePlacementButtons();
-        UpdateDrawButton();
+        gameController.GameStarted += HandleGameStarted;
+
+        if (gameController.IsReady)
+        {
+            HandleGameStarted();
+        }
+    }
+
+    private void HandleGameStarted()
+    {
+        RefreshViews();
     }
 
     private void RefreshViews(BoardSide? revealSide = null)
@@ -99,6 +108,9 @@ public class BoardInteractionController : MonoBehaviour
     {
         if (playerHandView != null)
             playerHandView.OnSelectionChanged -= HandleSelectionChanged;
+
+        if (gameController != null)
+            gameController.GameStarted -= HandleGameStarted;
 
         leftButton.onClick.RemoveListener(PlaceLeft);
         rightButton.onClick.RemoveListener(PlaceRight);

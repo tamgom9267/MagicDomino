@@ -67,6 +67,23 @@ public class PlayerData
         drawPile.AddRange(shuffledCollection.GetRange(7, shuffledCollection.Count - 7));
     }
 
+    public void SetInitialHand(int[] tileIds)
+    {
+        hand.Clear();
+
+        foreach (int id in tileIds)
+        {
+            foreach (TileData tile in tileCollection)
+            {
+                if (tile.InstanceId == id)
+                {
+                    hand.Add(tile);
+                    break;
+                }
+            }
+        }
+    }
+
 
     public bool HasTileInHand(TileData tile)
     {

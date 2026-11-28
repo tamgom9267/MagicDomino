@@ -6,7 +6,6 @@
 
 */
 
-using System;
 using UnityEngine;
 
 
@@ -25,7 +24,18 @@ public class SetupState : IGameState
         Debug.Log("Entering SetupState");
 
         session.Board.ClearBoard();
-        session.Player.StartRound();
+
+        foreach (PlayerData player in session.Players.Values)
+        {
+            player.StartRound();
+
+            Debug.Log(
+                $"Player {player.PlayerId}: " +
+                $"{player.Hand.Count} tiles in hand, " +
+                $"{player.DrawPile.Count} in draw pile"
+            );
+        }
+
     } 
 
     public void Exit()

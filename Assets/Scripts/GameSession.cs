@@ -46,5 +46,12 @@ public class GameSession
         return players[actorNumber];
     }
 
+}
 
+public class PlayerPublicData
+{
+    public int ActorNumber { get; set; }
+    public int HandCount { get; set; }
+    public int DrawPileCont { get; set; }
+    public int Score { get; set; }
 }
