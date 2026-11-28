@@ -17,6 +17,8 @@ public class GameNetworkController : MonoBehaviourPunCallbacks, IOnEventCallback
     private const byte PlayerReadyCode = 1;
     private const byte GameReadyCode = 2;
     private const byte InitialHandCode = 3;
+    private const byte RequestPlaceCode = 4;
+    private const byte TilePlacedCode = 5;
 
     private readonly HashSet<int> readyPlayers = new();
     private bool gameReady = false;
@@ -94,6 +96,50 @@ public class GameNetworkController : MonoBehaviourPunCallbacks, IOnEventCallback
             gameController.ReceiveInitialHand(handIds);
 
             Debug.Log($"Receive initial hand: {string.Join(", ", handIds)}");
+        }
+        else if (eventData.Code == RequestPlaceCode)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+                return;
+
+            if (eventData.CustomData is not int[] request ||
+                request.Length != 2)
+                return;
+
+            // Photon identifies the sender.
+            ProcessPlaceRequest(
+                eventData.Sender,
+                request[0],
+                (BoardSide)request[1]
+            );
+        }
+        else if (eventData.Code == TilePlacedCode)
+        {
+            // Only trust confirmed placements from the MasterClient.
+            if (PhotonNetwork.MasterClient == null ||
+                eventData.Sender !=
+                PhotonNetwork.MasterClient.ActorNumber)
+                return;
+
+            if (eventData.CustomData is not int[] data ||
+                data.Length != 5)
+                return;
+
+            bool applied = gameController.ApplyConfirmedPlacement(
+                data[0],
+                data[1],
+                (BoardSide)data[2],
+                (ElementType)data[3],
+                (ElementType)data[4]
+            );
+
+            if (!applied)
+            {
+                Debug.LogError(
+                    "Could not apply confirmed placement. " +
+                    "Board may be out of sync."
+                );
+            }
         }
     }
 
@@ -173,4 +219,82 @@ public class GameNetworkController : MonoBehaviourPunCallbacks, IOnEventCallback
             Debug.Log($"Initial hand queued for player {player.ActorNumber}: {sent}");
         }
     }
+
+
+    public void RequestPlaceTile(TileData tile, BoardSide side)
+    {
+        if (!gameController.HasInitialHand || tile == null)
+            return;
+
+        // MasterClient can process its own request directly.
+        if (PhotonNetwork.IsMasterClient)
+        {
+            ProcessPlaceRequest(
+                PhotonNetwork.LocalPlayer.ActorNumber,
+                tile.InstanceId,
+                side
+            );
+
+            return;
+        }
+
+        // Other players send the request to the MasterClient.
+        PhotonNetwork.RaiseEvent(
+            RequestPlaceCode,
+            new int[] { tile.InstanceId, (int)side },
+            new RaiseEventOptions
+            {
+                Receivers = ReceiverGroup.MasterClient
+            },
+            SendOptions.SendReliable
+        );
+    }
+
+
+    private void ProcessPlaceRequest(
+        int actorNumber,
+        int tileId,
+        BoardSide side)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        if (!gameController.TryPlaceTileAsMaster(
+            actorNumber,
+            tileId,
+            side,
+            out TileData placedTile))
+        {
+            Debug.LogWarning(
+                $"Rejected play from Actor {actorNumber}, Tile {tileId}"
+            );
+            return;
+        }
+
+        // Share the accepted move, not the private hand.
+        int[] placementData =
+        {
+            actorNumber,
+            placedTile.InstanceId,
+            (int)side,
+            (int)placedTile.ElementA,
+            (int)placedTile.ElementB
+        };
+
+        PhotonNetwork.RaiseEvent(
+            TilePlacedCode,
+            placementData,
+            new RaiseEventOptions
+            {
+                Receivers = ReceiverGroup.Others
+            },
+            SendOptions.SendReliable
+        );
+
+        Debug.Log(
+            $"Actor {actorNumber} placed tile {tileId} on {side}"
+        );
+    }
+
+
 }

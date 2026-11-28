@@ -3402,6 +3402,7 @@ MonoBehaviour:
   rightButton: {fileID: 154637286}
   drawButton: {fileID: 174645289}
   gameController: {fileID: 561104935}
+  gameNetworkController: {fileID: 1083496677}
 --- !u!114 &561104935
 MonoBehaviour:
   m_ObjectHideFlags: 0

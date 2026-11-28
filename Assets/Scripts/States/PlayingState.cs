@@ -45,23 +45,30 @@ public class PlayingState : IGameState
         return session.Board.CanPlace(tile, side);
     }
 
-    public bool TryPlaceTile(TileData tile, BoardSide side)
+    public bool TryPlaceTile(int actorNumber, TileData tile, BoardSide side)
     {
-        if (!CanPlace(tile,side))
-        {
+        if (!session.Players.TryGetValue(
+            actorNumber, out PlayerData player))
             return false;
-        }
+
+        if (tile == null || !player.HasTileInHand(tile))
+            return false;
+
+        if (side != BoardSide.Left &&
+            side != BoardSide.Right)
+            return false;
+
+        // Only allow the right side for the first tile.
+        if (session.Board.IsEmpty() && side != BoardSide.Right)
+            return false;
 
         if (!session.Board.TryPlaceTile(tile, side))
-        {
             return false;
-        }
 
-        session.Player.RemoveTileFromHand(tile);
-
+        player.RemoveTileFromHand(tile);
         return true;
     }
-
+    
     public bool CanDraw()
     {
         return session.Player.DrawPile.Count > 0;

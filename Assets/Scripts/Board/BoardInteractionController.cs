@@ -19,6 +19,7 @@ public class BoardInteractionController : MonoBehaviour
     [SerializeField] private Button drawButton;
 
     [SerializeField] private GameController gameController;
+    [SerializeField] private GameNetworkController gameNetworkController;
 
     
 
@@ -31,6 +32,7 @@ public class BoardInteractionController : MonoBehaviour
         drawButton.onClick.AddListener(DrawTile);
 
         gameController.InitialHandReady += HandleInitialHandReady;
+        gameController.BoardChanged += HandleBoardChanged;
 
         if (gameController.HasInitialHand)
         {
@@ -41,6 +43,11 @@ public class BoardInteractionController : MonoBehaviour
     private void HandleInitialHandReady()
     {
         RefreshViews();
+    }
+
+    private void HandleBoardChanged(BoardSide side)
+    {
+        RefreshViews(side);
     }
 
     private void RefreshViews(BoardSide? revealSide = null)
@@ -54,7 +61,7 @@ public class BoardInteractionController : MonoBehaviour
 
     private void UpdateDrawButton()
     {
-        drawButton.interactable = gameController.CanDraw();
+        drawButton.interactable = false;//gameController.CanDraw();
     }
 
     private void HandleSelectionChanged(TileData selectedTile)
@@ -96,12 +103,12 @@ public class BoardInteractionController : MonoBehaviour
             return;
         }
 
-        if (!gameController.TryPlaceTile(selectedTile, side))
+        if (!gameController.CanPlace(selectedTile, side))
         {
             return;
         }
 
-        RefreshViews(side);
+        gameNetworkController.RequestPlaceTile(selectedTile, side);
     }
 
     private void OnDestroy()
@@ -111,6 +118,9 @@ public class BoardInteractionController : MonoBehaviour
 
         if (gameController != null)
             gameController.InitialHandReady -= HandleInitialHandReady;
+
+        if (gameController != null)
+            gameController.BoardChanged -= HandleBoardChanged;
 
         leftButton.onClick.RemoveListener(PlaceLeft);
         rightButton.onClick.RemoveListener(PlaceRight);

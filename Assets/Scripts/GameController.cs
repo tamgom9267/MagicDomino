@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour
     // public event Action GameStarted;
     public bool HasInitialHand { get; private set; }
     public event Action InitialHandReady;
+    public event Action<BoardSide> BoardChanged;
 
     private void Awake()
     {
@@ -36,6 +37,7 @@ public class GameController : MonoBehaviour
         }
 
         stateMachine.ChangeState(new SetupState(session));
+        stateMachine.ChangeState(new PlayingState(session));
 
         HasInitialHand = true;
         InitialHandReady?.Invoke();
@@ -49,6 +51,7 @@ public class GameController : MonoBehaviour
         }
 
         session.Player.SetInitialHand(tileIds);
+        stateMachine.ChangeState(new PlayingState(session));
 
         HasInitialHand = true;
         InitialHandReady?.Invoke();
@@ -64,15 +67,81 @@ public class GameController : MonoBehaviour
         return playing.CanPlace(tile, side);
     }
 
-    public bool TryPlaceTile(TileData tile, BoardSide side)
+    
+    public bool TryPlaceTileAsMaster(int actorNumber, int tileId, BoardSide side, out TileData placedTile)
     {
+        placedTile = null;
+
         if (stateMachine.CurrentState is not PlayingState playing)
+            return false;
+
+        if (!session.Players.TryGetValue(
+            actorNumber, out PlayerData player))
+            return false;
+
+        // Find the actual tile in this player's hand.
+        foreach (TileData tile in player.Hand)
         {
+            if (tile.InstanceId == tileId)
+            {
+                placedTile = tile;
+                break;
+            }
+        }
+
+        if (placedTile == null)
+            return false;
+
+        if (!playing.TryPlaceTile(actorNumber, placedTile, side))
+        {
+            placedTile = null;
             return false;
         }
 
-        return playing.TryPlaceTile(tile, side);
+        BoardChanged?.Invoke(side);
+        return true;
     }
+
+
+    public bool ApplyConfirmedPlacement(int actorNumber, int tileId, BoardSide side, ElementType elementA, ElementType elementB)
+    {
+        if (stateMachine.CurrentState is not PlayingState)
+            return false;
+
+        if (side != BoardSide.Left &&
+            side != BoardSide.Right)
+            return false;
+
+        // The tile is now public information.
+        TileData tile = new TileData(
+            tileId, elementA, elementB);
+
+        if (!session.Board.TryPlaceTile(tile, side))
+            return false;
+
+        // Only remove from our own private hand.
+        if (actorNumber == session.LocalActorNumber)
+        {
+            TileData localTile = null;
+
+            foreach (TileData handTile in session.Player.Hand)
+            {
+                if (handTile.InstanceId == tileId)
+                {
+                    localTile = handTile;
+                    break;
+                }
+            }
+
+            if (localTile != null)
+                session.Player.RemoveTileFromHand(localTile);
+        }
+
+        BoardChanged?.Invoke(side);
+        return true;
+    }
+
+
 
     public bool CanDraw()
     {
