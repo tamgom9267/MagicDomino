@@ -16,9 +16,11 @@ public class GameController : MonoBehaviour
 
     public IReadOnlyList<TileData> Hand => session.Player.Hand;
     public BoardModel Board => session.Board;
-    public bool IsReady => stateMachine.CurrentState is PlayingState;
+    // public bool IsReady => stateMachine.CurrentState is PlayingState;
 
-    public event Action GameStarted;
+    // public event Action GameStarted;
+    public bool HasInitialHand { get; private set; }
+    public event Action InitialHandReady;
 
     private void Awake()
     {
@@ -26,16 +28,30 @@ public class GameController : MonoBehaviour
         stateMachine = new GameStateMachine();
     }
 
-    private void StartGame()
+    public void PrepareRoundAsMaster()
     {
-        if (IsReady)
+        if (HasInitialHand)
         {
             return;
         }
 
         stateMachine.ChangeState(new SetupState(session));
-        stateMachine.ChangeState(new PlayingState(session));
-        GameStarted?.Invoke();
+
+        HasInitialHand = true;
+        InitialHandReady?.Invoke();
+    }
+
+    public void ReceiveInitialHand(int[] tileIds)
+    {
+        if (HasInitialHand)
+        {
+            return;
+        }
+
+        session.Player.SetInitialHand(tileIds);
+
+        HasInitialHand = true;
+        InitialHandReady?.Invoke();
     }
 
     public bool CanPlace(TileData tile, BoardSide side)
@@ -86,6 +102,19 @@ public class GameController : MonoBehaviour
     public void SetLocalPlayer(int actorNumber)
     {
         session.SetLocalPlayer(actorNumber);
-        StartGame();
+    }
+
+    public int[] GetHandIds(int actorNumber)
+    {
+        PlayerData player = session.GetPlayer(actorNumber);
+
+        int[] handIds = new int[player.Hand.Count];
+
+        for (int i = 0; i < player.Hand.Count; i++)
+        {
+            handIds[i] = player.Hand[i].InstanceId;
+        }
+
+        return handIds;
     }
 }

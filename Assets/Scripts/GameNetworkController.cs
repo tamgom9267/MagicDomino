@@ -16,6 +16,7 @@ public class GameNetworkController : MonoBehaviourPunCallbacks, IOnEventCallback
 
     private const byte PlayerReadyCode = 1;
     private const byte GameReadyCode = 2;
+    private const byte InitialHandCode = 3;
 
     private readonly HashSet<int> readyPlayers = new();
     private bool gameReady = false;
@@ -76,6 +77,24 @@ public class GameNetworkController : MonoBehaviourPunCallbacks, IOnEventCallback
 
             MarkGameReady();
         }
+        else if (eventData.Code == InitialHandCode)
+        {
+            // Only accept the deal from the current MasterClient
+            if (PhotonNetwork.MasterClient == null || eventData.Sender != PhotonNetwork.MasterClient.ActorNumber)
+            {
+                return;
+            }
+
+            if (eventData.CustomData is not int[] handIds || handIds.Length != 7)
+            {
+                Debug.LogError("Invalid iniital hand");
+                return;
+            }
+
+            gameController.ReceiveInitialHand(handIds);
+
+            Debug.Log($"Receive initial hand: {string.Join(", ", handIds)}");
+        }
     }
 
     private void RegisterReadyPlayer(int actorNumber)
@@ -94,6 +113,8 @@ public class GameNetworkController : MonoBehaviourPunCallbacks, IOnEventCallback
         if (PhotonNetwork.PlayerList.Length == 2 && readyPlayers.Count == 2)
         {
             MarkGameReady();
+            gameController.PrepareRoundAsMaster();
+            SendInitialHands();
 
             PhotonNetwork.RaiseEvent(
                 GameReadyCode,
@@ -116,5 +137,40 @@ public class GameNetworkController : MonoBehaviourPunCallbacks, IOnEventCallback
         Debug.Log("Both players are ready!");
     }
 
-    
+    private void SendInitialHands()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            if (player.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+            {
+                continue;
+            }
+
+            int[] handIds = gameController.GetHandIds(player.ActorNumber);
+
+            if (handIds.Length != 7)
+            {
+                Debug.LogError($"Invalid initial hand for player {player.ActorNumber}");
+                continue;
+            }
+
+            // Send hand to other player
+            bool sent = PhotonNetwork.RaiseEvent(
+                InitialHandCode,
+                handIds,
+                new RaiseEventOptions
+                {
+                    TargetActors = new int[] { player.ActorNumber }
+                },
+                SendOptions.SendReliable
+            );
+
+            Debug.Log($"Initial hand queued for player {player.ActorNumber}: {sent}");
+        }
+    }
 }
